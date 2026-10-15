@@ -46,6 +46,27 @@ describe('UsersService', () => {
       ).rejects.toBeInstanceOf(ConflictException);
     });
 
+    it('responds with a 409 and a friendly, non-technical message', async () => {
+      prisma.user.update.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
+          code: 'P2002',
+          clientVersion: '6.19.3',
+        }),
+      );
+
+      try {
+        await service.connectWallet('user-1', 'GABC');
+        throw new Error('expected connectWallet to reject');
+      } catch (err) {
+        expect(err).toBeInstanceOf(ConflictException);
+        const exception = err as ConflictException;
+        expect(exception.getStatus()).toBe(409);
+        expect(exception.message).toBe(
+          'That wallet is already connected to another account',
+        );
+      }
+    });
+
     it('rethrows unrelated errors', async () => {
       prisma.user.update.mockRejectedValue(new Error('connection lost'));
 

@@ -1,0 +1,13 @@
+meta {
+  name: Get Price History
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/tickets/resale/{{listingId}}/price-history
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

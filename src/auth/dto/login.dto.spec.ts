@@ -20,6 +20,15 @@ describe('LoginDto', () => {
     expect(errors.some((e) => e.property === 'email')).toBe(true);
   });
 
+  it('trims and lowercases the email so it stays valid', async () => {
+    const dto = plainToInstance(LoginDto, {
+      email: '  Ada@Example.com  ',
+      password: 'anything',
+    });
+    expect(dto.email).toBe('ada@example.com');
+    expect(await validate(dto)).toHaveLength(0);
+  });
+
   it('rejects a non-string password', async () => {
     const dto = plainToInstance(LoginDto, {
       email: 'ada@example.com',

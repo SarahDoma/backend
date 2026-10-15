@@ -1,0 +1,21 @@
+meta {
+  name: Confirm Revoke
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/confirm-revoke
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "signedXdr": "string",
+    "txHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

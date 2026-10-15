@@ -1,0 +1,13 @@
+meta {
+  name: Get Offline Token
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/offline-token
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

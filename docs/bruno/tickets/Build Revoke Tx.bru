@@ -1,0 +1,13 @@
+meta {
+  name: Build Revoke Tx
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/revoke
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

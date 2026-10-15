@@ -28,8 +28,107 @@ jobs:
       - name: Lint
         run: npx eslint "src/**/*.ts"
 
-      - name: Unit tests
-        run: npm test
+      - name: Audit dependencies
+        run: npm run audit:check
+
+      - name: Unit tests (with coverage gate)
+        run: npm run test:cov
 
       - name: Build
         run: npm run build
+
+  e2e-test:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: stellar_tickets_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://test:test@localhost:5432/stellar_tickets_test
+      APP_URL: http://localhost:3000
+      PORT: 3000
+      JWT_SECRET: ci-test-jwt-secret-at-least-32-characters-long
+      SOROBAN_RPC_URL: https://soroban-testnet.stellar.org
+      STELLAR_NETWORK: testnet
+      TICKETING_CONTRACT_ID: CDUMMYCONTRACTIDFORCITESTINGONLYXXXXXXXXXXXXXXXXXXXXXXXX
+      PLATFORM_SIGNER_SECRET: SDUMMYPLATFORMSIGNERSECRETFORCITESTINGXXXXXXXXXXXXXXXXX
+      # Test-only Ed25519 keypair used solely to satisfy OfflineTokenService's
+      # startup validation in CI — never used outside this workflow.
+      OFFLINE_SIGNING_KEY_ID: 2026-01
+      OFFLINE_SIGNING_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIHuKr38pDFWNoCMb+QREmMyCMs6Vl7jSYHNHowkVmFun\n-----END PRIVATE KEY-----\n"
+      OFFLINE_SIGNING_PUBLIC_KEYS: '{"2026-01":"-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAk7v0I5F5hkTAq/iT7yi79LJApLqIDber4cmkKzz4RPo=\n-----END PUBLIC KEY-----\n"}'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run migrations
+        run: npx prisma migrate deploy
+
+      - name: e2e tests
+        run: npm run test:e2e
+
+  docker-build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t stellar-tickets/backend:ci .
+
+  migration-lint:
+    name: Migration lint (no schema drift)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # No real database is needed — the diff is computed from migration
+      # files and schema.prisma entirely in-process.
+      - name: Check for schema drift
+        env:
+          DATABASE_URL: postgresql://dummy:dummy@localhost:5432/dummy
+        run: npx prisma migrate diff --exit-code --schema prisma/schema.prisma --from-migrations --to-schema-datamodel
+
+  docs-check:
+    name: Docs (generated files up to date)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Deliberately no `npm ci`: both generators are dependency-free Node
+      # scripts, so this job keeps working even when the lockfile is out of
+      # sync and `npm ci` cannot install anything.
+      - name: Check generated env table and API collection
+        run: npm run docs:check

@@ -1,15 +1,10 @@
 import { Body, Controller, Get, Patch, Query, UseGuards } from '@nestjs/common';
-import { IsEmail } from 'class-validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../auth/decorators/current-user.decorator';
 import { UsersService } from './users.service';
 import { ConnectWalletDto } from './dto/connect-wallet.dto';
-
-class LookupQuery {
-  @IsEmail()
-  email: string;
-}
+import { LookupQuery } from './dto/lookup-query.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)

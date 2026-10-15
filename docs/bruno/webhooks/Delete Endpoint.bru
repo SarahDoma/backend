@@ -1,0 +1,13 @@
+meta {
+  name: Delete Endpoint
+  type: http
+}
+
+delete {
+  url: {{baseUrl}}/v1/organizations/{{organizationId}}/webhooks/{{webhookId}}
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

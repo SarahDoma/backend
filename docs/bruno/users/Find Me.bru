@@ -1,0 +1,13 @@
+meta {
+  name: Find Me
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/users/me
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

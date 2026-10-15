@@ -1,0 +1,25 @@
+meta {
+  name: Create
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/promo-codes
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "code": "PROMO-CODE_1",
+    "discountType": "PERCENT",
+    "discountValue": 1,
+    "maxRedemptions": 1,
+    "expiresAt": "2030-01-01T18:00:00.000Z",
+    "isActive": true
+  }
+}

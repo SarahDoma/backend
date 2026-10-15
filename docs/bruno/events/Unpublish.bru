@@ -1,0 +1,13 @@
+meta {
+  name: Unpublish
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/unpublish
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

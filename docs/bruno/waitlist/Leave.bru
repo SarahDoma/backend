@@ -1,0 +1,13 @@
+meta {
+  name: Leave
+  type: http
+}
+
+delete {
+  url: {{baseUrl}}/v1/ticket-types/{{ticketTypeId}}/waitlist
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

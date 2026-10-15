@@ -1,0 +1,16 @@
+meta {
+  name: Login
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/login
+  body: json
+}
+
+body:json {
+  {
+    "email": "you@example.com",
+    "password": "correct-horse-battery-staple"
+  }
+}

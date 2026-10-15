@@ -1,0 +1,13 @@
+meta {
+  name: Build Publish Tx
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/publish
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Register Endpoint
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/organizations/{{organizationId}}/webhooks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "url": "https://example.com/webhook",
+    "events": "string",
+    "secret": "whsec_example"
+  }
+}

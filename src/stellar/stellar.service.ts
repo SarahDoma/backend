@@ -9,15 +9,13 @@ import {
   TransactionBuilder,
   rpc,
   BASE_FEE,
-  Networks,
   xdr,
 } from '@stellar/stellar-sdk';
-
-const NETWORK_PASSPHRASES: Record<string, string> = {
-  testnet: Networks.TESTNET,
-  futurenet: Networks.FUTURENET,
-  mainnet: Networks.PUBLIC,
-};
+import { CircuitBreaker } from './circuit-breaker';
+import {
+  NETWORK_PASSPHRASES,
+  StellarNetwork,
+} from '../config/stellar-networks';
 
 export interface OnChainTicket {
   eventId: bigint;
@@ -30,6 +28,7 @@ export interface OnChainTicket {
 }
 
 export interface OnChainEvent {
+  eventId: bigint;
   organizer: string;
   name: string;
   category: string;
@@ -61,10 +60,11 @@ export class StellarService {
   private readonly contract: Contract;
   private readonly networkPassphrase: string;
   private readonly platformSigner: Keypair;
+  private readonly rpcCircuitBreaker = new CircuitBreaker();
 
   constructor(private readonly config: ConfigService) {
     const rpcUrl = this.config.getOrThrow<string>('SOROBAN_RPC_URL');
-    const network = this.config.getOrThrow<string>('STELLAR_NETWORK');
+    const network = this.config.getOrThrow<StellarNetwork>('STELLAR_NETWORK');
     this.server = new rpc.Server(rpcUrl, {
       allowHttp: rpcUrl.startsWith('http://'),
     });
@@ -75,6 +75,10 @@ export class StellarService {
     this.platformSigner = Keypair.fromSecret(
       this.config.getOrThrow<string>('PLATFORM_SIGNER_SECRET'),
     );
+  }
+
+  getCircuitBreakerMetrics() {
+    return this.rpcCircuitBreaker.metrics();
   }
 
   /** Read-only simulation — no signature, no ledger write, no fee. */
@@ -89,7 +93,7 @@ export class StellarService {
     const result = await this.simulateRead('get_event', [
       nativeToScVal(chainEventId, { type: 'u64' }),
     ]);
-    return this.decodeEvent(result);
+    return { eventId: chainEventId, ...this.decodeEvent(result) };
   }
 
   buildCreateEventTx(params: {
@@ -216,7 +220,9 @@ export class StellarService {
     signedXdr: string,
   ): Promise<{ result: unknown; txHash: string }> {
     const tx = TransactionBuilder.fromXDR(signedXdr, this.networkPassphrase);
-    const sendResult = await this.server.sendTransaction(tx);
+    const sendResult = await this.rpcCall(() =>
+      this.server.sendTransaction(tx),
+    );
     if (sendResult.status === 'ERROR') {
       throw new Error(
         `Soroban submission failed: ${JSON.stringify(sendResult.errorResult)}`,
@@ -229,8 +235,8 @@ export class StellarService {
   }
 
   private async simulateRead(fn: string, args: xdr.ScVal[]) {
-    const account = await this.server.getAccount(
-      this.platformSigner.publicKey(),
+    const account = await this.rpcCall(() =>
+      this.server.getAccount(this.platformSigner.publicKey()),
     );
     const tx = new TransactionBuilder(account, {
       fee: BASE_FEE,
@@ -240,7 +246,7 @@ export class StellarService {
       .setTimeout(30)
       .build();
 
-    const sim = await this.server.simulateTransaction(tx);
+    const sim = await this.rpcCall(() => this.server.simulateTransaction(tx));
     if (rpc.Api.isSimulationError(sim)) {
       throw new Error(`Soroban simulation failed for ${fn}: ${sim.error}`);
     }
@@ -256,7 +262,9 @@ export class StellarService {
     fn: string,
     args: xdr.ScVal[],
   ): Promise<string> {
-    const account = await this.server.getAccount(sourcePublicKey);
+    const account = await this.rpcCall(() =>
+      this.server.getAccount(sourcePublicKey),
+    );
     const built = new TransactionBuilder(account, {
       fee: BASE_FEE,
       networkPassphrase: this.networkPassphrase,
@@ -265,7 +273,9 @@ export class StellarService {
       .setTimeout(300)
       .build();
 
-    const prepared = await this.server.prepareTransaction(built);
+    const prepared = await this.rpcCall(() =>
+      this.server.prepareTransaction(built),
+    );
     return prepared.toXDR();
   }
 
@@ -274,7 +284,7 @@ export class StellarService {
     attempts = 15,
   ): Promise<xdr.ScVal> {
     for (let i = 0; i < attempts; i++) {
-      const tx = await this.server.getTransaction(hash);
+      const tx = await this.rpcCall(() => this.server.getTransaction(hash));
       if (tx.status === rpc.Api.GetTransactionStatus.SUCCESS) {
         if (!tx.returnValue) {
           throw new Error(
@@ -291,6 +301,10 @@ export class StellarService {
     throw new Error(`Timed out waiting for transaction ${hash} to land`);
   }
 
+  private rpcCall<T>(operation: () => Promise<T>): Promise<T> {
+    return this.rpcCircuitBreaker.execute(operation);
+  }
+
   private decodeTicket(scVal: xdr.ScVal): OnChainTicket {
     const native = scValToNative(scVal) as Record<string, unknown>;
     return {
@@ -304,7 +318,7 @@ export class StellarService {
     };
   }
 
-  private decodeEvent(scVal: xdr.ScVal): OnChainEvent {
+  private decodeEvent(scVal: xdr.ScVal): Omit<OnChainEvent, 'eventId'> {
     const native = scValToNative(scVal) as Record<string, unknown>;
     return {
       organizer: native.organizer as string,

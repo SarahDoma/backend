@@ -1,0 +1,21 @@
+meta {
+  name: Confirm Buy Resale
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/confirm-buy-resale
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "signedXdr": "string",
+    "txHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

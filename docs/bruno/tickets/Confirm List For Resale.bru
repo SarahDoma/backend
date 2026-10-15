@@ -1,0 +1,21 @@
+meta {
+  name: Confirm List For Resale
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/confirm-list-resale
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "price": "0",
+    "expiresAt": "2030-01-01T18:00:00.000Z"
+  }
+}

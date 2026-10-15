@@ -1,0 +1,13 @@
+meta {
+  name: List Endpoints
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/organizations/{{organizationId}}/webhooks
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

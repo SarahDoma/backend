@@ -1,0 +1,13 @@
+meta {
+  name: Get Offline Public Keys
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/tickets/offline-public-keys
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

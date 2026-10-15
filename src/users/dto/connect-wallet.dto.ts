@@ -2,5 +2,5 @@ import { IsStellarPublicKey } from '../../common/decorators/is-stellar-public-ke
 
 export class ConnectWalletDto {
   @IsStellarPublicKey()
-  stellarPublicKey: string;
+  stellarPublicKey!: string;
 }

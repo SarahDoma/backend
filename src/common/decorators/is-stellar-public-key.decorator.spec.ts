@@ -3,7 +3,7 @@ import { IsStellarPublicKey } from './is-stellar-public-key.decorator';
 
 class TestDto {
   @IsStellarPublicKey()
-  stellarAccount: string;
+  stellarAccount!: string;
 }
 
 describe('IsStellarPublicKey', () => {

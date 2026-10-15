@@ -1,0 +1,20 @@
+meta {
+  name: Connect Wallet
+  type: http
+}
+
+patch {
+  url: {{baseUrl}}/v1/users/me/wallet
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "stellarPublicKey": "{{publicKey}}"
+  }
+}

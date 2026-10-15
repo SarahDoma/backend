@@ -1,0 +1,13 @@
+meta {
+  name: Find By Chain Ticket Id
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/tickets/by-chain/{{chainTicketId}}
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,13 @@
+meta {
+  name: Remove
+  type: http
+}
+
+delete {
+  url: {{baseUrl}}/v1/events/{{eventId}}/gates/{{gateId}}
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

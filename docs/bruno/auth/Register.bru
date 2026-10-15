@@ -1,0 +1,17 @@
+meta {
+  name: Register
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/auth/register
+  body: json
+}
+
+body:json {
+  {
+    "email": "you@example.com",
+    "password": "correct-horse-battery-staple",
+    "name": "Launch Night"
+  }
+}

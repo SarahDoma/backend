@@ -1,0 +1,20 @@
+meta {
+  name: Register
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/scanner-devices
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Launch Night"
+  }
+}

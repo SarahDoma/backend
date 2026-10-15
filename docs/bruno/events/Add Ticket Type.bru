@@ -1,0 +1,25 @@
+meta {
+  name: Add Ticket Type
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/ticket-types
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Launch Night",
+    "price": "0",
+    "quantityTotal": 1,
+    "saleStartsAt": "2030-01-01T18:00:00.000Z",
+    "saleEndsAt": "2030-01-01T18:00:00.000Z",
+    "isHidden": "string"
+  }
+}

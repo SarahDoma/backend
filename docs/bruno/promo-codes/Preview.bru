@@ -1,0 +1,21 @@
+meta {
+  name: Preview
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/promo-codes/preview
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "ticketTypeId": "00000000-0000-4000-8000-000000000000",
+    "code": "string"
+  }
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Offer Next
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/ticket-types/{{ticketTypeId}}/waitlist/offer-next
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "count": 1,
+    "windowMs": 60000
+  }
+}

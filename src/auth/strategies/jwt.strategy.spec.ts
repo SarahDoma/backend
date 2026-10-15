@@ -1,10 +1,8 @@
-import { ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy';
 
 describe('JwtStrategy', () => {
   it('maps a decoded payload to the shape guards and controllers expect', () => {
-    const config = { getOrThrow: jest.fn().mockReturnValue('x'.repeat(32)) };
-    const strategy = new JwtStrategy(config as unknown as ConfigService);
+    const strategy = new JwtStrategy('x'.repeat(32));
 
     const result = strategy.validate({
       sub: 'user-1',
@@ -19,11 +17,7 @@ describe('JwtStrategy', () => {
     });
   });
 
-  it('reads JWT_SECRET from config at construction time', () => {
-    const config = { getOrThrow: jest.fn().mockReturnValue('x'.repeat(32)) };
-    const strategy = new JwtStrategy(config as unknown as ConfigService);
-    expect(strategy).toBeDefined();
-
-    expect(config.getOrThrow).toHaveBeenCalledWith('JWT_SECRET');
+  it('is constructed with the secret resolved by JwtSecretModule', () => {
+    expect(new JwtStrategy('x'.repeat(32))).toBeDefined();
   });
 });

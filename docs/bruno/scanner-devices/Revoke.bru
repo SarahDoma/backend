@@ -1,0 +1,13 @@
+meta {
+  name: Revoke
+  type: http
+}
+
+patch {
+  url: {{baseUrl}}/v1/events/{{eventId}}/scanner-devices/{{deviceId}}/revoke
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

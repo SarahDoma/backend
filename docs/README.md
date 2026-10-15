@@ -1,9 +1,9 @@
 # Docs index
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) — module layout and the non-custodial write path
-- [API.md](API.md) — endpoint summary
+- [ARCHITECTURE.md](ARCHITECTURE.md) — module layout, the non-custodial write path, and sequence diagrams for the ticket lifecycle
+- [API.md](API.md) — every endpoint with request fields, curl and response examples
 - [DATABASE.md](DATABASE.md) — schema and migrations
-- [TESTING.md](TESTING.md) — test suite notes
+- [TESTING.md](TESTING.md) — test suite notes, the StellarService contract-mock harness
 - [DEPLOYMENT.md](DEPLOYMENT.md) — deployment checklist
 - [GLOSSARY.md](GLOSSARY.md) — terminology
 - [FAQ.md](FAQ.md) — frequently asked questions
@@ -12,7 +12,10 @@
 - [VALIDATION.md](VALIDATION.md) — DTO validation approach
 - [ERROR_HANDLING.md](ERROR_HANDLING.md) — exception handling
 - [OBSERVABILITY.md](OBSERVABILITY.md) — logging/metrics gaps
-- [RATE_LIMITING.md](RATE_LIMITING.md) — known gap
+- [RATE_LIMITING.md](RATE_LIMITING.md) — scan rate limits, memory vs Redis storage
+- [CACHING.md](CACHING.md) — HTTP cache headers and the memory/Redis application cache
+- [WEBHOOKS.md](WEBHOOKS.md) — optional BullMQ queue for outbound webhooks
+- [SCHEDULER.md](SCHEDULER.md) — cron jobs and the `SCHEDULER_ENABLED` switch
 - [CORS.md](CORS.md) — allowed origins
 - [CONFIGURATION.md](CONFIGURATION.md) — environment variables
 - [PRISMA_7_NOTE.md](PRISMA_7_NOTE.md) — why Prisma is pinned to 6.x

@@ -13,4 +13,10 @@ describe('ListForResaleDto', () => {
     const errors = await validate(dto);
     expect(errors.some((e) => e.property === 'price')).toBe(true);
   });
+
+  it('rejects a non-numeric price string', async () => {
+    const dto = plainToInstance(ListForResaleDto, { price: '12.5' });
+    const errors = await validate(dto);
+    expect(errors.some((e) => e.property === 'price')).toBe(true);
+  });
 });

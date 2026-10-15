@@ -1,0 +1,13 @@
+meta {
+  name: Build Buy Resale Tx
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/buy-resale
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Update Resale Price
+  type: http
+}
+
+patch {
+  url: {{baseUrl}}/v1/tickets/resale/{{listingId}}/price
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "price": "0"
+  }
+}

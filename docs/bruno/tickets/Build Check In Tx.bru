@@ -1,0 +1,13 @@
+meta {
+  name: Build Check In Tx
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/{{ticketId}}/check-in
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

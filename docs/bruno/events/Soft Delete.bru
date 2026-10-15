@@ -1,0 +1,13 @@
+meta {
+  name: Soft Delete
+  type: http
+}
+
+delete {
+  url: {{baseUrl}}/v1/events/{{eventId}}
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -31,4 +31,17 @@ describe('RegisterDto', () => {
     const errors = await validate(build({ name: '' }));
     expect(errors.some((e) => e.property === 'name')).toBe(true);
   });
+
+  it('trims and lowercases the email so it stays valid', async () => {
+    const dto = build({ email: '  Ada@Example.com  ' });
+    expect(dto.email).toBe('ada@example.com');
+    expect(await validate(dto)).toHaveLength(0);
+  });
+
+  it('leaves a non-string email untouched for @IsEmail to reject', async () => {
+    const dto = build({ email: undefined });
+    expect(dto.email).toBeUndefined();
+    const errors = await validate(dto);
+    expect(errors.some((e) => e.property === 'email')).toBe(true);
+  });
 });

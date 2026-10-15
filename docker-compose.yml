@@ -10,5 +10,28 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  # Runs the API with hot reload against the `postgres` service above.
+  # Included under the "full" profile so `docker compose up` (no profile)
+  # keeps its existing behaviour of just starting the database; run
+  # `docker compose --profile full up` for the full one-command dev stack.
+  api:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://stellartickets:stellartickets@postgres:5432/stellartickets
+      PORT: 3000
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npx prisma migrate deploy && npm run start:dev"
+
 volumes:
   postgres-data:

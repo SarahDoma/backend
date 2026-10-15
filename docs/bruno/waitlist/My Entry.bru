@@ -1,0 +1,13 @@
+meta {
+  name: My Entry
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/ticket-types/{{ticketTypeId}}/waitlist/me
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

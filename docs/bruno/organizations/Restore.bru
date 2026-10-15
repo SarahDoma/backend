@@ -1,0 +1,13 @@
+meta {
+  name: Restore
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/organizations/{{id}}/restore
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

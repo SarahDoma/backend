@@ -1,0 +1,13 @@
+meta {
+  name: Revoke
+  type: http
+}
+
+delete {
+  url: {{baseUrl}}/v1/events/{{eventId}}/promo-codes/{{promoCodeId}}
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

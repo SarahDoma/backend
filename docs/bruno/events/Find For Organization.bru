@@ -1,0 +1,13 @@
+meta {
+  name: Find For Organization
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/organizations/{{organizationId}}/events
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Build Purchase Tx
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/purchase
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "ticketTypeId": "00000000-0000-4000-8000-000000000000",
+    "seat": "string",
+    "promoCode": "string"
+  }
+}

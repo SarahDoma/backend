@@ -1,0 +1,21 @@
+meta {
+  name: Confirm Publish
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/confirm-publish
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "signedXdr": "string",
+    "txHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

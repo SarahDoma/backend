@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../auth/decorators/current-user.decorator';
@@ -26,5 +34,15 @@ export class OrganizationsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.organizationsService.findOne(id);
+  }
+
+  @Delete(':id')
+  softDelete(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.organizationsService.softDelete(user.userId, id);
+  }
+
+  @Post(':id/restore')
+  restore(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
+    return this.organizationsService.restore(user.userId, id);
   }
 }

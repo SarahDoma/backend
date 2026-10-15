@@ -1,14 +1,20 @@
 import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
-import { CreateEventDto } from './create-event.dto';
+import { Industry } from '@prisma/client';
+import {
+  CreateEventDto,
+  STARTS_AT_PAST_TOLERANCE_MS,
+} from './create-event.dto';
+
+const inMs = (offset: number) => new Date(Date.now() + offset).toISOString();
 
 function build(overrides: Record<string, unknown> = {}) {
   return plainToInstance(CreateEventDto, {
     name: 'Radiohead Live',
     category: 'CONCERTS',
     venue: 'Amphitheater',
-    startsAt: '2026-09-14T20:00:00.000Z',
+    startsAt: inMs(24 * 60 * 60 * 1000),
     ...overrides,
   });
 }
@@ -43,9 +49,42 @@ describe('CreateEventDto', () => {
     expect(errors.some((e) => e.property === 'startsAt')).toBe(true);
   });
 
-  it('rejects an unrecognized category', async () => {
+  it('rejects a startsAt that has already elapsed', async () => {
+    const errors = await validate(
+      build({ startsAt: inMs(-24 * 60 * 60 * 1000) }),
+    );
+    const startsAtError = errors.find((e) => e.property === 'startsAt');
+
+    expect(startsAtError).toBeDefined();
+    expect(Object.values(startsAtError?.constraints ?? {})).toContain(
+      'startsAt must not be in the past',
+    );
+  });
+
+  it('tolerates a startsAt slightly in the past to absorb clock skew', async () => {
+    const errors = await validate(
+      build({ startsAt: inMs(-STARTS_AT_PAST_TOLERANCE_MS / 2) }),
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it('rejects a startsAt just beyond the clock tolerance', async () => {
+    const errors = await validate(
+      build({ startsAt: inMs(-STARTS_AT_PAST_TOLERANCE_MS * 2) }),
+    );
+    expect(errors.some((e) => e.property === 'startsAt')).toBe(true);
+  });
+
+  it('rejects an unrecognized category and lists the allowed values', async () => {
     const errors = await validate(build({ category: 'SPACE_TRAVEL' }));
-    expect(errors.some((e) => e.property === 'category')).toBe(true);
+    const categoryError = errors.find((e) => e.property === 'category');
+
+    expect(categoryError).toBeDefined();
+    const message = Object.values(categoryError?.constraints ?? {})[0];
+    expect(message).toContain('category must be one of');
+    for (const value of Object.values(Industry)) {
+      expect(message).toContain(value);
+    }
   });
 
   it('accepts a payload with ticket types', async () => {

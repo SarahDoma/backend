@@ -1,0 +1,13 @@
+meta {
+  name: Find One
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/organizations/{{id}}
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,13 @@
+meta {
+  name: Join
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/ticket-types/{{ticketTypeId}}/waitlist
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

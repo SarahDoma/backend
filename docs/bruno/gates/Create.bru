@@ -1,0 +1,20 @@
+meta {
+  name: Create
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/events/{{eventId}}/gates
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Launch Night"
+  }
+}

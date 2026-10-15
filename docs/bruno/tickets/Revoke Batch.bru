@@ -1,0 +1,20 @@
+meta {
+  name: Revoke Batch
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/events/{{eventId}}/revoke-batch
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "ticketIds": []
+  }
+}

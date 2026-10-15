@@ -1,0 +1,26 @@
+meta {
+  name: Create
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/organizations/{{organizationId}}/events
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Launch Night",
+    "category": "CONCERTS",
+    "venue": "The Fillmore",
+    "startsAt": "2030-01-01T18:00:00.000Z",
+    "endsAt": "2030-01-01T18:00:00.000Z",
+    "maxResaleMultiplierBps": 10000,
+    "royaltyBps": 0
+  }
+}

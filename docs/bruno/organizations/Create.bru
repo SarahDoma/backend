@@ -1,0 +1,25 @@
+meta {
+  name: Create
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/organizations
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "name": "Launch Night",
+    "slug": "my-slug",
+    "industry": "CONCERTS",
+    "stellarAccount": "{{publicKey}}",
+    "logoUrl": "https://example.com/webhook",
+    "websiteUrl": "https://example.com/webhook"
+  }
+}

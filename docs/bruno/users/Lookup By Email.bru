@@ -1,0 +1,13 @@
+meta {
+  name: Lookup By Email
+  type: http
+}
+
+get {
+  url: {{baseUrl}}/v1/users/lookup
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

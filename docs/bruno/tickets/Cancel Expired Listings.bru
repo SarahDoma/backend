@@ -1,0 +1,13 @@
+meta {
+  name: Cancel Expired Listings
+  type: http
+}
+
+post {
+  url: {{baseUrl}}/v1/tickets/resale/cancel-expired
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { CreateTicketTypeDto } from './create-ticket-type.dto';
@@ -34,5 +35,10 @@ describe('CreateTicketTypeDto', () => {
   it('rejects an empty name', async () => {
     const errors = await validate(build({ name: '' }));
     expect(errors.some((e) => e.property === 'name')).toBe(true);
+  });
+
+  it('rejects a non-numeric price string', async () => {
+    const errors = await validate(build({ price: 'abc' }));
+    expect(errors.some((e) => e.property === 'price')).toBe(true);
   });
 });
