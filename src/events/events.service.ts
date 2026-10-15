@@ -11,6 +11,9 @@ import { StellarService } from '../stellar/stellar.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { CreateTicketTypeDto } from './dto/create-ticket-type.dto';
 
+/** On-chain existence derived from `StellarService.getEvent`, reported alongside the cached DB `status` when reconciliation is requested. */
+export type OnChainReconciliationStatus = 'PUBLISHED' | 'NOT_FOUND' | 'NOT_PUBLISHED';
+
 @Injectable()
 export class EventsService {
   constructor(
@@ -21,17 +24,38 @@ export class EventsService {
 
   async create(userId: string, organizationId: string, dto: CreateEventDto) {
     await this.organizations.assertMember(organizationId, userId);
-    return this.prisma.event.create({
-      data: {
-        organizationId,
-        name: dto.name,
-        category: dto.category,
-        venue: dto.venue,
-        startsAt: dto.startsAt,
-        endsAt: dto.endsAt,
-        maxResaleMultiplierBps: dto.maxResaleMultiplierBps ?? 11_000,
-        royaltyBps: dto.royaltyBps ?? 500,
-      },
+    const org = await this.organizations.findOne(organizationId);
+
+    return this.prisma.$transaction(async (tx) => {
+      const event = await tx.event.create({
+        data: {
+          organizationId,
+          name: dto.name,
+          category: dto.category,
+          venue: dto.venue,
+          startsAt: dto.startsAt,
+          endsAt: dto.endsAt,
+          maxResaleMultiplierBps:
+            dto.maxResaleMultiplierBps ?? org.defaultMaxResaleMultiplierBps,
+          royaltyBps: dto.royaltyBps ?? org.defaultRoyaltyBps,
+        },
+      });
+
+      if (dto.ticketTypes?.length) {
+        await tx.ticketType.createMany({
+          data: dto.ticketTypes.map((ticketType) => ({
+            eventId: event.id,
+            name: ticketType.name,
+            price: BigInt(ticketType.price),
+            quantityTotal: ticketType.quantityTotal,
+          })),
+        });
+      }
+
+      return tx.event.findUniqueOrThrow({
+        where: { id: event.id },
+        include: { ticketTypes: true },
+      });
     });
   }
 
@@ -89,6 +113,15 @@ export class EventsService {
     }
 
     await this.stellar.submitSignedTransaction(signedXdr);
+
+    try {
+      await this.stellar.getEvent(event.chainEventId);
+    } catch {
+      throw new BadRequestException(
+        'Submission succeeded but the on-chain event could not be confirmed',
+      );
+    }
+
     return this.prisma.event.update({
       where: { id: eventId },
       data: { status: EventStatus.PUBLISHED },
@@ -104,6 +137,29 @@ export class EventsService {
       throw new NotFoundException('Event not found');
     }
     return event;
+  }
+
+  /** Looks up the event, optionally reconciling its cached DB `status` against the chain. */
+  async getWithReconciliation(eventId: string, reconcile: boolean) {
+    const event = await this.getWithOrg(eventId);
+    if (!reconcile) {
+      return event;
+    }
+    return { ...event, onChainStatus: await this.getOnChainStatus(event) };
+  }
+
+  private async getOnChainStatus(event: {
+    chainEventId: bigint | null;
+  }): Promise<OnChainReconciliationStatus> {
+    if (event.chainEventId === null) {
+      return 'NOT_PUBLISHED';
+    }
+    try {
+      await this.stellar.getEvent(event.chainEventId);
+      return 'PUBLISHED';
+    } catch {
+      return 'NOT_FOUND';
+    }
   }
 
   findPublished() {

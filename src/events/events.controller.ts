@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import type { CurrentUserPayload } from '../auth/decorators/current-user.decorator';
@@ -17,8 +25,14 @@ export class EventsController {
   }
 
   @Get('events/:eventId')
-  findOne(@Param('eventId') eventId: string) {
-    return this.eventsService.getWithOrg(eventId);
+  findOne(
+    @Param('eventId') eventId: string,
+    @Query('reconcile') reconcile?: string,
+  ) {
+    return this.eventsService.getWithReconciliation(
+      eventId,
+      reconcile === 'true',
+    );
   }
 
   @Get('organizations/:organizationId/events')

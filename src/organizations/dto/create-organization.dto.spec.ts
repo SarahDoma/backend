@@ -39,4 +39,25 @@ describe('CreateOrganizationDto', () => {
     const errors = await validate(build({ stellarAccount: 'not-valid' }));
     expect(errors.some((e) => e.property === 'stellarAccount')).toBe(true);
   });
+
+  it('accepts optional resale defaults within range', async () => {
+    const errors = await validate(
+      build({ defaultMaxResaleMultiplierBps: 15_000, defaultRoyaltyBps: 1_000 }),
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it('rejects a defaultMaxResaleMultiplierBps below 10000', async () => {
+    const errors = await validate(
+      build({ defaultMaxResaleMultiplierBps: 5_000 }),
+    );
+    expect(
+      errors.some((e) => e.property === 'defaultMaxResaleMultiplierBps'),
+    ).toBe(true);
+  });
+
+  it('rejects a defaultRoyaltyBps above 2000', async () => {
+    const errors = await validate(build({ defaultRoyaltyBps: 3_000 }));
+    expect(errors.some((e) => e.property === 'defaultRoyaltyBps')).toBe(true);
+  });
 });

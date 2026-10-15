@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
   IsEnum,
   IsInt,
@@ -8,8 +9,10 @@ import {
   Max,
   Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { Industry } from '@prisma/client';
+import { CreateEventTicketTypeDto } from './create-ticket-type.dto';
 
 export class CreateEventDto {
   @IsString()
@@ -45,4 +48,11 @@ export class CreateEventDto {
   @Min(0)
   @Max(2_000)
   royaltyBps?: number;
+
+  /** Ticket types to create alongside the event, in the same transaction. */
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEventTicketTypeDto)
+  ticketTypes?: CreateEventTicketTypeDto[];
 }

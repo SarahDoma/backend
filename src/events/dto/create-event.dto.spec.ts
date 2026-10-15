@@ -47,4 +47,20 @@ describe('CreateEventDto', () => {
     const errors = await validate(build({ category: 'SPACE_TRAVEL' }));
     expect(errors.some((e) => e.property === 'category')).toBe(true);
   });
+
+  it('accepts a payload with ticket types', async () => {
+    const errors = await validate(
+      build({
+        ticketTypes: [{ name: 'General', price: '1000', quantityTotal: 100 }],
+      }),
+    );
+    expect(errors).toHaveLength(0);
+  });
+
+  it('rejects a ticket type missing a required field', async () => {
+    const errors = await validate(
+      build({ ticketTypes: [{ price: '1000', quantityTotal: 100 }] }),
+    );
+    expect(errors.some((e) => e.property === 'ticketTypes')).toBe(true);
+  });
 });

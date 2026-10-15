@@ -76,17 +76,22 @@ model User {
 }
 
 model Organization {
-  id             String               @id @default(uuid())
-  name           String
-  slug           String               @unique
-  industry       Industry
+  id                             String               @id @default(uuid())
+  name                           String
+  slug                           String               @unique
+  industry                       Industry
   /// Stellar (G...) address that signs `create_event`/`issue_ticket` calls
   /// and receives primary-sale + royalty payments for this organizer.
-  stellarAccount String
-  members        OrganizationMember[]
-  events         Event[]
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  stellarAccount                 String
+  /// Default `Event.maxResaleMultiplierBps` applied when a new event's DTO
+  /// omits it.
+  defaultMaxResaleMultiplierBps  Int                  @default(11000)
+  /// Default `Event.royaltyBps` applied when a new event's DTO omits it.
+  defaultRoyaltyBps              Int                  @default(500)
+  members                        OrganizationMember[]
+  events                         Event[]
+  createdAt                      DateTime             @default(now())
+  updatedAt                      DateTime             @updatedAt
 }
 
 model OrganizationMember {

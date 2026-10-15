@@ -1,4 +1,13 @@
-import { IsEnum, IsString, Matches, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Matches,
+  Max,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { Industry } from '@prisma/client';
 import { IsStellarPublicKey } from '../../common/decorators/is-stellar-public-key.decorator';
 
@@ -17,4 +26,18 @@ export class CreateOrganizationDto {
 
   @IsStellarPublicKey()
   stellarAccount: string;
+
+  /** Default basis-point resale cap applied to this org's events when their DTO omits it. */
+  @IsOptional()
+  @IsInt()
+  @Min(10_000)
+  @Max(50_000)
+  defaultMaxResaleMultiplierBps?: number;
+
+  /** Default basis-point resale royalty applied to this org's events when their DTO omits it. */
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(2_000)
+  defaultRoyaltyBps?: number;
 }
