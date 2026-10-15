@@ -111,6 +111,7 @@ issued.
 | `CORS_ORIGINS` | string | **required** | `http://localhost:3001` | yes | Comma-separated list of allowed CORS origins (e.g. "https://app.example.com,https://staging.example.com"). Wildcard (*) is NOT allowed in production. Used as the CORS allow-list and to build links in outbound email/webhooks.
 | `JSON_BODY_LIMIT` | string | optional | `100kb` | yes | Maximum accepted JSON request body, as an Express size string such as 100kb or 1mb. Larger payloads are rejected with 413. Default 100kb.
 | `CSP_DIRECTIVES` | string | optional | `{"defaultSrc":["'self'"],"scriptSrc":["'self'"]}` \* | yes | Helmet Content-Security-Policy directives as a JSON object string, e.g. {"defaultSrc":["'self'"]}. Leave unset to keep helmet's defaults.
+| `TRUST_PROXY` | string | optional | — | yes | Express `trust proxy` setting: `true`, `false`, a hop count, or a comma-separated list of proxy IPs / CIDR ranges. Unset means `false`. See docs/DEPLOYMENT.md.
 | `SOROBAN_RPC_URL` | string | **required** | — | yes | Soroban RPC endpoint the StellarService submits contract calls through.
 | `STELLAR_NETWORK` | — | **required** | `testnet` | yes | Which Stellar network every contract call targets. Must match the network the `ticketing` contract is deployed on and the one user wallets are set
 | `TICKETING_CONTRACT_ID` | string | **required** | — | yes | Deployed `ticketing` contract's C... address.
